@@ -1,0 +1,6 @@
+{
+  "name": "Aftershot",
+  "description": "Jogo arcade minimalista 2D de precisão com física de flechas persistentes projetado prioritariamente para dispositivos móveis.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

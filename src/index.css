@@ -1,0 +1,60 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --color-ivory: #F3EBDD;
+    --color-charcoal: #222321;
+    --color-impact-red: #D94336;
+    --color-amber: #E9A23B;
+    --color-memory-gray: #B7B2A8;
+    --color-light-white: #FFFDF7;
+    
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  }
+
+  * {
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: var(--color-ivory);
+    color: var(--color-charcoal);
+  }
+}
+
+.font-display {
+  font-family: 'Space Grotesk', 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
+.font-body {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
+/* Subtle editorial paper grain */
+.paper-texture {
+  background-color: #F3EBDD;
+  background-image: radial-gradient(rgba(34, 35, 33, 0.03) 1px, transparent 0);
+  background-size: 24px 24px;
+}
+
+/* Mobile Safe Areas */
+.pt-safe {
+  padding-top: env(safe-area-inset-top, 16px);
+}
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 20px);
+}
+.pl-safe {
+  padding-left: env(safe-area-inset-left, 16px);
+}
+.pr-safe {
+  padding-right: env(safe-area-inset-right, 16px);
+}
