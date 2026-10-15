@@ -58,3 +58,28 @@
 .pr-safe {
   padding-right: env(safe-area-inset-right, 16px);
 }
+
+/* Custom Editorial Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(34, 35, 33, 0.22);
+  border-radius: 9999px;
+  transition: background-color 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(34, 35, 33, 0.45);
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(34, 35, 33, 0.25) transparent;
+}

@@ -7,13 +7,17 @@ import {
   Point, 
   ShotRecord, 
   GameSession, 
-  GameSettings 
+  GameSettings,
+  Obstacle 
 } from '../types/game';
 import { 
   calculateTrajectory, 
   checkPersistentArrowCollision, 
+  checkObstacleCollision,
   checkTargetCollision, 
   generateNextTargetPosition,
+  generateObstaclesForScore,
+  updateObstacles,
   pointToSegmentDistance
 } from '../game/physics';
 import { renderGameScene } from '../game/canvasRenderer';
@@ -50,6 +54,7 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
 
   // Active game entities in refs for 60fps loop without React re-render lag
   const targetRef = useRef<Target | null>(null);
+  const obstaclesRef = useRef<Obstacle[]>([]);
   const flyingArrowRef = useRef<FlyingArrow | null>(null);
   const persistentArrowsRef = useRef<PersistentArrow[]>([]);
   const particlesRef = useRef<Particle[]>([]);
@@ -114,6 +119,16 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
       window.removeEventListener('orientationchange', handleResize);
     };
   }, [handleResize]);
+
+  // Dynamically generate/adapt obstacles as score advances (strictly smaller than target)
+  useEffect(() => {
+    obstaclesRef.current = generateObstaclesForScore(
+      score,
+      dimensions.width,
+      dimensions.height,
+      targetRef.current
+    );
+  }, [score, dimensions.width, dimensions.height]);
 
   // Audio configuration sync
   useEffect(() => {
@@ -385,10 +400,27 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
             }
             if (highlightNearMiss) break;
           }
+
+          // Check for proximity with dynamic obstacles
+          if (!highlightNearMiss) {
+            for (const pt of trajectoryPoints) {
+              for (const obs of obstaclesRef.current) {
+                const d = Math.hypot(pt.x - obs.x, pt.y - obs.y);
+                if (d < obs.radius + 8) {
+                  highlightNearMiss = { x: pt.x, y: pt.y };
+                  break;
+                }
+              }
+              if (highlightNearMiss) break;
+            }
+          }
         }
       }
 
-      // 3. Update Flying Arrow Physics
+      // 3. Update Dynamic Obstacles Physics
+      updateObstacles(obstaclesRef.current, dt);
+
+      // 4. Update Flying Arrow Physics
       const arrow = flyingArrowRef.current;
       if (arrow) {
         const prevX = arrow.x;
@@ -460,7 +492,59 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
           }
         }
 
-        // B. Collision with Persistent Arrow Shaft ("Passado persistente")
+        // B. Collision with Obstacles (Dynamic smaller physical pins)
+        if (!arrowSettled && arrow) {
+          const obsCol = checkObstacleCollision(arrow, prevX, prevY, obstaclesRef.current);
+          if (obsCol.collided && obsCol.contactPoint) {
+            arrowSettled = true;
+
+            soundEngine.playCollision();
+            haptics.trigger('collision');
+            shakeRef.current = { x: 0, y: 0, duration: 0.16 };
+            addCollisionParticles(obsCol.contactPoint.x, obsCol.contactPoint.y);
+
+            const newPersistent: PersistentArrow = {
+              id: `arr_obs_${Date.now()}_${Math.random()}`,
+              startX: obsCol.contactPoint.x - Math.cos(arrow.angle) * arrow.length,
+              startY: obsCol.contactPoint.y - Math.sin(arrow.angle) * arrow.length,
+              tipX: obsCol.contactPoint.x,
+              tipY: obsCol.contactPoint.y,
+              length: arrow.length,
+              angle: arrow.angle,
+              settledAt: currentTime,
+              wobbleAmount: 0.14,
+              wobbleSpeed: 30,
+              isHitTarget: false,
+            };
+
+            persistentArrowsRef.current.push(newPersistent);
+            soundEngine.updateMemoryChorus(persistentArrowsRef.current.length);
+
+            shotsHistoryRef.current.push({
+              shotIndex: totalShotsRef.current,
+              from: { x: arrow.sourceX, y: arrow.sourceY },
+              to: { x: obsCol.contactPoint.x, y: obsCol.contactPoint.y },
+              hit: false,
+              precision: false,
+              collidedWithArrow: true,
+              scoreGained: 0,
+              timestamp: currentTime,
+            });
+
+            flyingArrowRef.current = null;
+
+            const newMisses = misses + 1;
+            onMissUpdate(newMisses);
+
+            if (!settings.zenMode && newMisses >= maxMisses) {
+              setTimeout(() => {
+                triggerSessionEnd();
+              }, 450);
+            }
+          }
+        }
+
+        // C. Collision with Persistent Arrow Shaft ("Passado persistente")
         if (!arrowSettled && arrow) {
           const arrowCol = checkPersistentArrowCollision(
             arrow,
@@ -523,7 +607,7 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
           }
         }
 
-        // C. Collision with Field Boundary / Walls (Missed past the target)
+        // D. Collision with Field Boundary / Walls (Missed past the target)
         if (!arrowSettled && arrow) {
           const margin = 14;
           const isOutOfBounds = 
@@ -610,6 +694,7 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
         height,
         pixelRatio: dpr,
         target: targetRef.current,
+        obstacles: obstaclesRef.current,
         flyingArrow: flyingArrowRef.current,
         persistentArrows: persistentArrowsRef.current,
         particles: particlesRef.current,

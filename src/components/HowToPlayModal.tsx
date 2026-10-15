@@ -75,11 +75,26 @@ export const HowToPlayModal: React.FC<HowToPlayModalProps> = ({ onClose }) => {
               03
             </div>
             <h3 className="font-display text-sm font-bold text-[#222321]">
+              Obstáculos em Progressão
+            </h3>
+          </div>
+          <p className="text-xs text-[#222321]/75 leading-relaxed font-body">
+            Conforme a partida avança, pequenos pinos geométricos surgem no campo (sempre menores que o alvo principal). Contorne-os para manter sua sequência.
+          </p>
+        </div>
+
+        {/* Passo 4 */}
+        <div className="bg-white p-4 rounded-2xl border border-[#222321]/10 flex flex-col gap-2">
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-[#D94336]/10 text-[#D94336] flex items-center justify-center font-display font-bold text-xs">
+              04
+            </div>
+            <h3 className="font-display text-sm font-bold text-[#222321]">
               Atravesse Seus Próprios Erros
             </h3>
           </div>
           <p className="text-xs text-[#222321]/75 leading-relaxed font-body">
-            Conforme a partida avança, o campo se transforma em uma escultura viva. Encontre frestas milimétricas para acertar o alvo e aumentar sua pontuação.
+            O campo se transforma em uma escultura viva das suas decisões. Encontre frestas milimétricas para acertar o centro e assinar sua partida.
           </p>
         </div>
       </div>

@@ -29,6 +29,21 @@ export interface Target {
   vy?: number;
 }
 
+export interface Obstacle {
+  id: string;
+  x: number;
+  y: number;
+  radius: number; // strictly smaller than target (target is 22-28px, obstacle is 9-12px)
+  baseX: number;
+  baseY: number;
+  vx: number;
+  vy: number;
+  oscillationRange: number;
+  oscillationSpeed: number;
+  phase: number;
+  shape: 'circle' | 'diamond';
+}
+
 export interface FlyingArrow {
   x: number;
   y: number;

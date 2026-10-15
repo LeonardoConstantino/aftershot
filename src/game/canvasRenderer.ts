@@ -1,4 +1,4 @@
-import { Target, FlyingArrow, PersistentArrow, Particle, Point } from '../types/game';
+import { Target, FlyingArrow, PersistentArrow, Particle, Point, Obstacle } from '../types/game';
 
 export interface RenderContext {
   ctx: CanvasRenderingContext2D;
@@ -6,6 +6,7 @@ export interface RenderContext {
   height: number;
   pixelRatio: number;
   target: Target | null;
+  obstacles: Obstacle[];
   flyingArrow: FlyingArrow | null;
   persistentArrows: PersistentArrow[];
   particles: Particle[];
@@ -29,6 +30,7 @@ export function renderGameScene(options: RenderContext): void {
     width,
     height,
     target,
+    obstacles,
     flyingArrow,
     persistentArrows,
     particles,
@@ -51,15 +53,20 @@ export function renderGameScene(options: RenderContext): void {
   // 1. Draw subtle boundary borders (clean editorial hairline)
   drawFieldBounds(ctx, width, height);
 
-  // 2. Draw persistent arrows (the living sculpture of the past)
+  // 2. Draw dynamic gameplay obstacles (smaller than target)
+  if (obstacles && obstacles.length > 0) {
+    drawObstacles(ctx, obstacles);
+  }
+
+  // 3. Draw persistent arrows (the living sculpture of the past)
   drawPersistentArrows(ctx, persistentArrows);
 
-  // 3. Draw active target
+  // 4. Draw active target
   if (target) {
     drawTarget(ctx, target);
   }
 
-  // 4. Draw trajectory & bow if aiming
+  // 5. Draw trajectory & bow if aiming
   if (aimVector && trajectoryPoints.length > 0) {
     drawAimingTrajectory(ctx, trajectoryPoints, highlightNearMiss);
     drawBowAndArrow(ctx, bowOrigin, aimVector);
@@ -68,12 +75,12 @@ export function renderGameScene(options: RenderContext): void {
     drawRestingBow(ctx, bowOrigin);
   }
 
-  // 5. Draw flying arrow
+  // 6. Draw flying arrow
   if (flyingArrow) {
     drawFlyingArrow(ctx, flyingArrow);
   }
 
-  // 6. Draw particles
+  // 7. Draw particles
   drawParticles(ctx, particles);
 
   ctx.restore();
@@ -112,6 +119,85 @@ function drawFieldBounds(ctx: CanvasRenderingContext2D, width: number, height: n
   ctx.stroke();
 
   ctx.restore();
+}
+
+/**
+ * Render dynamic obstacles that appear as gameplay progresses.
+ * STRICTLY smaller than the target (radius 9-11px vs target's 24-28px).
+ */
+function drawObstacles(ctx: CanvasRenderingContext2D, obstacles: Obstacle[]): void {
+  for (const obs of obstacles) {
+    ctx.save();
+    ctx.translate(obs.x, obs.y);
+
+    const r = obs.radius;
+
+    if (obs.shape === 'diamond') {
+      // Rotating geometric diamond pin
+      ctx.rotate(obs.phase * 0.4);
+
+      // Outer diamond
+      ctx.beginPath();
+      ctx.moveTo(0, -r);
+      ctx.lineTo(r, 0);
+      ctx.lineTo(0, r);
+      ctx.lineTo(-r, 0);
+      ctx.closePath();
+      ctx.fillStyle = COLOR_CHARCOAL;
+      ctx.fill();
+      ctx.strokeStyle = COLOR_LIGHT_WHITE;
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+
+      // Inner diamond
+      const ir = r * 0.45;
+      ctx.beginPath();
+      ctx.moveTo(0, -ir);
+      ctx.lineTo(ir, 0);
+      ctx.lineTo(0, ir);
+      ctx.lineTo(-ir, 0);
+      ctx.closePath();
+      ctx.fillStyle = COLOR_IVORY;
+      ctx.fill();
+
+      // Core micro-pin
+      ctx.fillStyle = COLOR_AMBER;
+      ctx.beginPath();
+      ctx.arc(0, 0, 1.8, 0, Math.PI * 2);
+      ctx.fill();
+    } else {
+      // Minimalist circular pillar pin
+      // Outer subtle physical collision field
+      ctx.beginPath();
+      ctx.arc(0, 0, r + 2.5, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(34, 35, 33, 0.12)';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      // Main circular body
+      ctx.beginPath();
+      ctx.arc(0, 0, r, 0, Math.PI * 2);
+      ctx.fillStyle = COLOR_CHARCOAL;
+      ctx.fill();
+      ctx.strokeStyle = COLOR_LIGHT_WHITE;
+      ctx.lineWidth = 1.4;
+      ctx.stroke();
+
+      // Middle ring
+      ctx.beginPath();
+      ctx.arc(0, 0, r * 0.52, 0, Math.PI * 2);
+      ctx.fillStyle = COLOR_LIGHT_WHITE;
+      ctx.fill();
+
+      // Center core
+      ctx.beginPath();
+      ctx.arc(0, 0, r * 0.25, 0, Math.PI * 2);
+      ctx.fillStyle = COLOR_CHARCOAL;
+      ctx.fill();
+    }
+
+    ctx.restore();
+  }
 }
 
 /**
@@ -157,6 +243,156 @@ function drawTarget(ctx: CanvasRenderingContext2D, target: Target): void {
 }
 
 /**
+ * Exquisite High-Craft Arrow Renderer
+ * Renders an authentic broadhead razor arrow with:
+ * - Tapered wooden shaft & cylindrical volume highlight
+ * - Thread/sinew bindings at ferrule and fletching ends
+ * - Parabolic feathered vanes with micro-barb cuts
+ * - Carved string nock
+ * - Faceted broadhead razor blade with center ridge
+ */
+export function drawDetailedArrow(
+  ctx: CanvasRenderingContext2D,
+  length: number,
+  options: {
+    strokeColor: string;
+    alpha?: number;
+    isFlying?: boolean;
+    isHitTarget?: boolean;
+    isRecent?: boolean;
+  }
+): void {
+  const { strokeColor, alpha = 1.0, isFlying = false, isHitTarget = false, isRecent = true } = options;
+
+  ctx.save();
+  ctx.globalAlpha = alpha;
+
+  const arrowLen = length || 40;
+
+  // 1. Aerodynamic in-flight stream whiskers (only when flying)
+  if (isFlying) {
+    ctx.strokeStyle = 'rgba(34, 35, 33, 0.22)';
+    ctx.lineWidth = 1.0;
+    ctx.beginPath();
+    ctx.moveTo(-6, -4);
+    ctx.lineTo(-18, -4);
+    ctx.moveTo(-6, 4);
+    ctx.lineTo(-18, 4);
+    ctx.stroke();
+  }
+
+  // 2. Carved string nock at tail (x = 0 to 4)
+  ctx.strokeStyle = strokeColor;
+  ctx.lineWidth = 1.8;
+  ctx.beginPath();
+  ctx.moveTo(0, -1.8);
+  ctx.lineTo(4, -1.8);
+  ctx.moveTo(0, 1.8);
+  ctx.lineTo(4, 1.8);
+  ctx.stroke();
+
+  // 3. Wooden Shaft (x = 4 to arrowLen - 11)
+  ctx.strokeStyle = strokeColor;
+  ctx.lineWidth = isRecent ? 2.2 : 1.8;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.moveTo(4, 0);
+  ctx.lineTo(arrowLen - 11, 0);
+  ctx.stroke();
+
+  // Subtle top highlight line giving the shaft cylindrical volume
+  ctx.strokeStyle = isRecent ? 'rgba(255, 253, 247, 0.55)' : 'rgba(255, 253, 247, 0.25)';
+  ctx.lineWidth = 0.8;
+  ctx.beginPath();
+  ctx.moveTo(6, -0.6);
+  ctx.lineTo(arrowLen - 13, -0.6);
+  ctx.stroke();
+
+  // 4. Thread Binding Wraps
+  ctx.strokeStyle = isRecent ? COLOR_MEMORY_GRAY : strokeColor;
+  ctx.lineWidth = 1.2;
+  // Near fletching
+  ctx.beginPath();
+  ctx.moveTo(5, -1.6); ctx.lineTo(5, 1.6);
+  ctx.moveTo(19, -1.6); ctx.lineTo(19, 1.6);
+  // Near arrowhead ferrule
+  ctx.moveTo(arrowLen - 13, -1.8); ctx.lineTo(arrowLen - 13, 1.8);
+  ctx.moveTo(arrowLen - 11, -1.8); ctx.lineTo(arrowLen - 11, 1.8);
+  ctx.stroke();
+
+  // 5. Parabolic Feather Fletchings (x = 5 to x = 19)
+  // Upper feather vane
+  ctx.fillStyle = strokeColor;
+  ctx.beginPath();
+  ctx.moveTo(5, 0);
+  ctx.quadraticCurveTo(11, -5.5, 18, -5.2);
+  ctx.lineTo(19, -1.2);
+  ctx.lineTo(5, 0);
+  ctx.closePath();
+  ctx.fill();
+
+  // Upper feather micro-rib cuts
+  ctx.strokeStyle = COLOR_LIGHT_WHITE;
+  ctx.lineWidth = 0.8;
+  ctx.beginPath();
+  ctx.moveTo(10, -1.0); ctx.lineTo(12, -4.0);
+  ctx.moveTo(14, -1.0); ctx.lineTo(16, -4.2);
+  ctx.stroke();
+
+  // Lower feather vane
+  ctx.fillStyle = strokeColor;
+  ctx.beginPath();
+  ctx.moveTo(5, 0);
+  ctx.quadraticCurveTo(11, 5.5, 18, 5.2);
+  ctx.lineTo(19, 1.2);
+  ctx.lineTo(5, 0);
+  ctx.closePath();
+  ctx.fill();
+
+  // Lower feather micro-rib cuts
+  ctx.strokeStyle = COLOR_LIGHT_WHITE;
+  ctx.lineWidth = 0.8;
+  ctx.beginPath();
+  ctx.moveTo(10, 1.0); ctx.lineTo(12, 4.0);
+  ctx.moveTo(14, 1.0); ctx.lineTo(16, 4.2);
+  ctx.stroke();
+
+  // 6. Broadhead Razor Arrowhead (x = arrowLen - 11 to x = arrowLen)
+  const tipX = arrowLen;
+  const barbX = arrowLen - 10.5;
+  const ferruleX = arrowLen - 8;
+
+  // Solid broadhead body
+  ctx.fillStyle = strokeColor;
+  ctx.beginPath();
+  ctx.moveTo(tipX, 0); // razor tip
+  ctx.lineTo(barbX, -4.6); // top barb point
+  ctx.lineTo(ferruleX, -1.4); // top barb notch
+  ctx.lineTo(ferruleX, 1.4); // bottom barb notch
+  ctx.lineTo(barbX, 4.6); // bottom barb point
+  ctx.closePath();
+  ctx.fill();
+
+  // Center bevel ridge line & highlight
+  ctx.strokeStyle = COLOR_LIGHT_WHITE;
+  ctx.lineWidth = 1.0;
+  ctx.beginPath();
+  ctx.moveTo(ferruleX, 0);
+  ctx.lineTo(tipX, 0);
+  ctx.stroke();
+
+  // 7. Hit target amber pin notch
+  if (isHitTarget) {
+    ctx.fillStyle = COLOR_AMBER;
+    ctx.beginPath();
+    ctx.arc(tipX, 0, 2.8, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  ctx.restore();
+}
+
+/**
  * Render persistent arrows with graceful aging ("Cinza de Memória")
  */
 function drawPersistentArrows(ctx: CanvasRenderingContext2D, arrows: PersistentArrow[]): void {
@@ -189,52 +425,14 @@ function drawPersistentArrows(ctx: CanvasRenderingContext2D, arrows: PersistentA
     ctx.translate(arrow.startX, arrow.startY);
     ctx.rotate(arrow.angle + wobble);
 
-    ctx.globalAlpha = alpha;
-    ctx.strokeStyle = strokeColor;
-    ctx.lineWidth = isRecent ? 2.0 : 1.6;
-    ctx.lineCap = 'round';
-
-    // Shaft
-    ctx.beginPath();
-    ctx.moveTo(0, 0);
-    ctx.lineTo(arrow.length, 0);
-    ctx.stroke();
-
-    // Arrowhead at tip
-    ctx.fillStyle = strokeColor;
-    ctx.beginPath();
-    const headLen = 9;
-    const headWidth = 3.8;
-    ctx.moveTo(arrow.length, 0);
-    ctx.lineTo(arrow.length - headLen, -headWidth);
-    ctx.lineTo(arrow.length - headLen * 0.75, 0);
-    ctx.lineTo(arrow.length - headLen, headWidth);
-    ctx.closePath();
-    ctx.fill();
-
-    // Fletching (feathers) at the tail (startX)
-    ctx.strokeStyle = strokeColor;
-    ctx.lineWidth = 1.2;
-    const fletchLen = 6;
-    const fletchBack = 7;
-    // top feather
-    ctx.beginPath();
-    ctx.moveTo(2, 0);
-    ctx.lineTo(2 + fletchBack, -fletchLen);
-    ctx.stroke();
-    // bottom feather
-    ctx.beginPath();
-    ctx.moveTo(2, 0);
-    ctx.lineTo(2 + fletchBack, fletchLen);
-    ctx.stroke();
-
-    // If it hit the target, draw a tiny amber notch ring at the point
-    if (arrow.isHitTarget) {
-      ctx.fillStyle = COLOR_AMBER;
-      ctx.beginPath();
-      ctx.arc(arrow.length, 0, 2.5, 0, Math.PI * 2);
-      ctx.fill();
-    }
+    // Render with exquisite craftsmanship
+    drawDetailedArrow(ctx, arrow.length, {
+      strokeColor,
+      alpha,
+      isFlying: false,
+      isHitTarget: arrow.isHitTarget,
+      isRecent,
+    });
 
     ctx.restore();
   }
@@ -248,36 +446,16 @@ function drawFlyingArrow(ctx: CanvasRenderingContext2D, arrow: FlyingArrow): voi
   ctx.translate(arrow.x, arrow.y);
   ctx.rotate(arrow.angle);
 
-  // Shaft
-  ctx.strokeStyle = COLOR_CHARCOAL;
-  ctx.lineWidth = 2.2;
-  ctx.lineCap = 'round';
-  ctx.beginPath();
-  ctx.moveTo(-arrow.length, 0);
-  ctx.lineTo(0, 0);
-  ctx.stroke();
+  // Tip is at (0, 0), tail is at (-arrow.length, 0)
+  // Translate so drawDetailedArrow operates from tail (0,0) to tip (length,0)
+  ctx.translate(-arrow.length, 0);
 
-  // Arrowhead
-  ctx.fillStyle = COLOR_CHARCOAL;
-  ctx.beginPath();
-  const headLen = 10;
-  const headWidth = 4.2;
-  ctx.moveTo(0, 0);
-  ctx.lineTo(-headLen, -headWidth);
-  ctx.lineTo(-headLen * 0.75, 0);
-  ctx.lineTo(-headLen, headWidth);
-  ctx.closePath();
-  ctx.fill();
-
-  // Feathers at tail
-  ctx.strokeStyle = COLOR_CHARCOAL;
-  ctx.lineWidth = 1.3;
-  ctx.beginPath();
-  ctx.moveTo(-arrow.length + 2, 0);
-  ctx.lineTo(-arrow.length + 9, -6);
-  ctx.moveTo(-arrow.length + 2, 0);
-  ctx.lineTo(-arrow.length + 9, 6);
-  ctx.stroke();
+  drawDetailedArrow(ctx, arrow.length, {
+    strokeColor: COLOR_CHARCOAL,
+    alpha: 1.0,
+    isFlying: true,
+    isRecent: true,
+  });
 
   ctx.restore();
 }
@@ -315,8 +493,9 @@ function drawAimingTrajectory(
   ctx.translate(last.x, last.y);
   ctx.rotate(angle);
   ctx.moveTo(0, 0);
-  ctx.lineTo(-7, -3.5);
-  ctx.lineTo(-7, 3.5);
+  ctx.lineTo(-8, -4.0);
+  ctx.lineTo(-6, 0);
+  ctx.lineTo(-8, 4.0);
   ctx.closePath();
   ctx.fill();
   ctx.restore();
@@ -325,9 +504,9 @@ function drawAimingTrajectory(
   if (nearMiss) {
     ctx.save();
     ctx.strokeStyle = COLOR_AMBER;
-    ctx.lineWidth = 1.2;
+    ctx.lineWidth = 1.4;
     ctx.beginPath();
-    ctx.arc(nearMiss.x, nearMiss.y, 6, 0, Math.PI * 2);
+    ctx.arc(nearMiss.x, nearMiss.y, 7, 0, Math.PI * 2);
     ctx.stroke();
     ctx.restore();
   }
@@ -341,36 +520,30 @@ function drawRestingBow(ctx: CanvasRenderingContext2D, origin: Point): void {
   ctx.translate(origin.x, origin.y);
 
   // Subtle archer bow arc
-  ctx.strokeStyle = 'rgba(34, 35, 33, 0.35)';
-  ctx.lineWidth = 2.0;
+  ctx.strokeStyle = 'rgba(34, 35, 33, 0.45)';
+  ctx.lineWidth = 2.4;
   ctx.beginPath();
-  ctx.arc(0, 8, 22, -Math.PI * 0.85, -Math.PI * 0.15);
+  ctx.arc(0, 8, 24, -Math.PI * 0.85, -Math.PI * 0.15);
   ctx.stroke();
 
   // Bow string
-  ctx.strokeStyle = 'rgba(34, 35, 33, 0.2)';
-  ctx.lineWidth = 1.0;
+  ctx.strokeStyle = 'rgba(34, 35, 33, 0.3)';
+  ctx.lineWidth = 1.2;
   ctx.beginPath();
-  ctx.moveTo(-18, 0);
-  ctx.lineTo(18, 0);
+  ctx.moveTo(-20, 0);
+  ctx.lineTo(20, 0);
   ctx.stroke();
 
-  // Ready arrow resting on bow
-  ctx.strokeStyle = 'rgba(34, 35, 33, 0.45)';
-  ctx.lineWidth = 1.8;
-  ctx.beginPath();
-  ctx.moveTo(0, 4);
-  ctx.lineTo(0, -32);
-  ctx.stroke();
-
-  // Tip
-  ctx.fillStyle = 'rgba(34, 35, 33, 0.55)';
-  ctx.beginPath();
-  ctx.moveTo(0, -32);
-  ctx.lineTo(-4, -26);
-  ctx.lineTo(4, -26);
-  ctx.closePath();
-  ctx.fill();
+  // Ready arrow resting on bow (tail at string, pointing up)
+  ctx.save();
+  ctx.translate(0, 2);
+  ctx.rotate(-Math.PI / 2);
+  drawDetailedArrow(ctx, 36, {
+    strokeColor: 'rgba(34, 35, 33, 0.7)',
+    alpha: 0.85,
+    isRecent: true,
+  });
+  ctx.restore();
 
   ctx.restore();
 }
@@ -393,14 +566,14 @@ function drawBowAndArrow(
 
   // Bow wood stave
   ctx.strokeStyle = COLOR_CHARCOAL;
-  ctx.lineWidth = 2.4;
+  ctx.lineWidth = 2.6;
   ctx.beginPath();
   ctx.arc(0, 0, 24, -Math.PI * 0.45, Math.PI * 0.45);
   ctx.stroke();
 
   // Tensioned string
-  ctx.strokeStyle = 'rgba(34, 35, 33, 0.6)';
-  ctx.lineWidth = 1.2;
+  ctx.strokeStyle = 'rgba(34, 35, 33, 0.7)';
+  ctx.lineWidth = 1.4;
   const topTipX = Math.cos(-Math.PI * 0.45) * 24;
   const topTipY = Math.sin(-Math.PI * 0.45) * 24;
   const botTipX = Math.cos(Math.PI * 0.45) * 24;
@@ -412,25 +585,15 @@ function drawBowAndArrow(
   ctx.lineTo(botTipX, botTipY);
   ctx.stroke();
 
-  // Pulled arrow
-  const arrowLen = 38;
-  ctx.strokeStyle = COLOR_CHARCOAL;
-  ctx.lineWidth = 2.0;
-  ctx.beginPath();
-  ctx.moveTo(-pullDist, 0);
-  ctx.lineTo(-pullDist + arrowLen, 0);
-  ctx.stroke();
-
-  // Arrowhead
-  ctx.fillStyle = COLOR_CHARCOAL;
-  ctx.beginPath();
-  const tipX = -pullDist + arrowLen;
-  ctx.moveTo(tipX, 0);
-  ctx.lineTo(tipX - 8, -3.5);
-  ctx.lineTo(tipX - 6, 0);
-  ctx.lineTo(tipX - 8, 3.5);
-  ctx.closePath();
-  ctx.fill();
+  // Pulled arrow resting against tensioned string
+  ctx.save();
+  ctx.translate(-pullDist, 0);
+  drawDetailedArrow(ctx, 40, {
+    strokeColor: COLOR_CHARCOAL,
+    alpha: 1.0,
+    isRecent: true,
+  });
+  ctx.restore();
 
   ctx.restore();
 }
@@ -477,7 +640,6 @@ function drawParticles(ctx: CanvasRenderingContext2D, particles: Particle[]): vo
  * Color interpolation helper
  */
 function lerpColor(c1: string, c2: string, factor: number): string {
-  // Simple hex interpolation
   const parse = (hex: string) => {
     const clean = hex.replace('#', '');
     return [

@@ -3,6 +3,7 @@ import { RotateCcw, Share2, Eye, Home } from 'lucide-react';
 import { GameSession, BestStats } from '../types/game';
 import { soundEngine } from '../audio/soundEngine';
 import { haptics } from '../utils/haptics';
+import { drawDetailedArrow } from '../game/canvasRenderer';
 
 interface GameOverModalProps {
   session: GameSession;
@@ -88,21 +89,12 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
       ctx.translate(arrow.startX, arrow.startY);
       ctx.rotate(arrow.angle);
 
-      ctx.strokeStyle = isRecent ? '#222321' : '#B7B2A8';
-      ctx.lineWidth = 2.0 / scale;
-      ctx.beginPath();
-      ctx.moveTo(0, 0);
-      ctx.lineTo(arrow.length, 0);
-      ctx.stroke();
-
-      // Tip
-      ctx.fillStyle = isRecent ? '#222321' : '#B7B2A8';
-      ctx.beginPath();
-      ctx.moveTo(arrow.length, 0);
-      ctx.lineTo(arrow.length - 8, -3.5);
-      ctx.lineTo(arrow.length - 8, 3.5);
-      ctx.closePath();
-      ctx.fill();
+      drawDetailedArrow(ctx, arrow.length, {
+        strokeColor: isRecent ? '#222321' : '#B7B2A8',
+        alpha: 1.0,
+        isRecent,
+        isHitTarget: arrow.isHitTarget,
+      });
 
       ctx.restore();
     }

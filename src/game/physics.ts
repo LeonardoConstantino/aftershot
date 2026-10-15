@@ -225,3 +225,107 @@ export function generateNextTargetPosition(
     hitCount: currentHitCount,
   };
 }
+
+/**
+ * Check if the flying arrow collided with any obstacle pin
+ */
+export function checkObstacleCollision(
+  arrow: FlyingArrow,
+  prevX: number,
+  prevY: number,
+  obstacles: import('../types/game').Obstacle[]
+): { collided: boolean; hitObstacle?: import('../types/game').Obstacle; contactPoint?: Point } {
+  for (const obs of obstacles) {
+    const { dist, closestX, closestY } = pointToSegmentDistance(
+      obs.x,
+      obs.y,
+      prevX,
+      prevY,
+      arrow.x,
+      arrow.y
+    );
+
+    // Collision threshold = obstacle radius + arrow tip radius (2px)
+    if (dist <= obs.radius + 2.0) {
+      return {
+        collided: true,
+        hitObstacle: obs,
+        contactPoint: { x: closestX, y: closestY },
+      };
+    }
+  }
+
+  return { collided: false };
+}
+
+/**
+ * Update obstacle oscillation
+ */
+export function updateObstacles(
+  obstacles: import('../types/game').Obstacle[],
+  dt: number
+): void {
+  for (const obs of obstacles) {
+    obs.phase += obs.oscillationSpeed * dt;
+    obs.x = obs.baseX + Math.sin(obs.phase) * obs.oscillationRange;
+  }
+}
+
+/**
+ * Generates appropriate dynamic obstacles based on game score.
+ * Note: Each obstacle is strictly smaller than the target (radius 9-11px vs target's 24-28px).
+ */
+export function generateObstaclesForScore(
+  score: number,
+  width: number,
+  height: number,
+  target: Target | null
+): import('../types/game').Obstacle[] {
+  // Score 0-2: No obstacles (learning period)
+  // Score 3-6: 1 obstacle
+  // Score 7-11: 2 obstacles
+  // Score 12+: 3 obstacles
+  let desiredCount = 0;
+  if (score >= 3 && score < 7) desiredCount = 1;
+  else if (score >= 7 && score < 12) desiredCount = 2;
+  else if (score >= 12) desiredCount = 3;
+
+  if (desiredCount === 0) return [];
+
+  const obstacles: import('../types/game').Obstacle[] = [];
+  const marginX = Math.max(50, width * 0.16);
+  const minY = height * 0.36;
+  const maxY = height * 0.64;
+
+  for (let i = 0; i < desiredCount; i++) {
+    const frac = (i + 1) / (desiredCount + 1);
+    const baseX = marginX + frac * (width - marginX * 2) + (Math.sin(i * 3.7) * 20);
+    const baseY = minY + (i / Math.max(1, desiredCount - 1 || 1)) * (maxY - minY) * 0.7 + (i % 2 === 0 ? 0 : 35);
+
+    // Obstacle radius is 9px to 11.5px (strictly smaller than target which is 22px-28px)
+    const obstacleRadius = 9.5 + (i % 2) * 1.5;
+
+    // Check distance to target if exists
+    if (target) {
+      const d = Math.hypot(baseX - target.x, baseY - target.y);
+      if (d < 50) continue; // avoid spawning directly under target
+    }
+
+    obstacles.push({
+      id: `obs_${i}_${score}`,
+      x: baseX,
+      y: baseY,
+      baseX,
+      baseY,
+      radius: obstacleRadius,
+      vx: 0,
+      vy: 0,
+      oscillationRange: 14 + i * 4,
+      oscillationSpeed: 1.2 + i * 0.4,
+      phase: i * 1.4,
+      shape: i % 2 === 0 ? 'diamond' : 'circle',
+    });
+  }
+
+  return obstacles;
+}
