@@ -15,14 +15,14 @@ export const HowToPlayModal: React.FC<HowToPlayModalProps> = ({ onClose }) => {
   };
 
   return (
-    <div className="absolute inset-0 z-40 bg-[#F3EBDD]/95 backdrop-blur-sm flex flex-col justify-between p-6 select-none animate-fadeIn">
+    <div className="absolute inset-0 z-40 bg-[#F3EBDD]/95 backdrop-blur-sm flex flex-col justify-between px-4 sm:px-6 py-2.5 sm:py-4 select-none animate-fadeIn overflow-hidden">
       {/* Header */}
-      <header className="pt-safe w-full flex items-center justify-between border-b border-[#222321]/10 pb-4">
+      <header className="pt-safe shrink-0 w-full flex items-center justify-between border-b border-[#222321]/10 pb-2.5">
         <div>
-          <span className="text-[11px] font-mono tracking-widest text-[#B7B2A8] uppercase">
+          <span className="text-[10px] sm:text-[11px] font-mono tracking-widest text-[#B7B2A8] uppercase">
             Instruções
           </span>
-          <h2 className="font-display text-2xl font-bold tracking-tight text-[#222321]">
+          <h2 className="font-display text-xl sm:text-2xl font-bold tracking-tight text-[#222321]">
             Como Jogar
           </h2>
         </div>
@@ -36,8 +36,8 @@ export const HowToPlayModal: React.FC<HowToPlayModalProps> = ({ onClose }) => {
         </button>
       </header>
 
-      {/* 3 Step Cards */}
-      <div className="flex-1 overflow-y-auto py-4 flex flex-col gap-3.5">
+      {/* 4 Step Cards */}
+      <div className="min-h-0 flex-1 overflow-y-auto py-2.5 flex flex-col gap-2.5">
         {/* Passo 1 */}
         <div className="bg-white p-4 rounded-2xl border border-[#222321]/10 flex flex-col gap-2">
           <div className="flex items-center gap-2">
@@ -100,10 +100,10 @@ export const HowToPlayModal: React.FC<HowToPlayModalProps> = ({ onClose }) => {
       </div>
 
       {/* Footer */}
-      <footer className="pb-safe w-full">
+      <footer className="pb-safe shrink-0 w-full pt-1">
         <button
           onClick={handleClose}
-          className="w-full h-12 bg-[#222321] text-[#F3EBDD] font-display text-sm font-bold tracking-wide rounded-xl flex items-center justify-center active:scale-95 transition-all"
+          className="w-full h-11 sm:h-12 bg-[#222321] text-[#F3EBDD] font-display text-sm font-bold tracking-wide rounded-xl flex items-center justify-center active:scale-95 transition-all"
         >
           ENTENDIDO
         </button>

@@ -270,14 +270,14 @@ export const PosterModal: React.FC<PosterModalProps> = ({
   };
 
   return (
-    <div className="absolute inset-0 z-40 bg-[#222321]/60 backdrop-blur-sm flex flex-col justify-between p-4 sm:p-6 select-none animate-fadeIn">
+    <div className="absolute inset-0 z-40 bg-[#222321]/60 backdrop-blur-sm flex flex-col justify-between px-3 sm:px-6 py-2.5 sm:py-4 select-none animate-fadeIn overflow-hidden">
       {/* Header bar */}
-      <header className="pt-safe w-full flex items-center justify-between text-[#F3EBDD]">
+      <header className="pt-safe shrink-0 w-full flex items-center justify-between text-[#F3EBDD] pb-1">
         <div>
-          <h3 className="font-display text-lg font-bold tracking-tight">
+          <h3 className="font-display text-base sm:text-lg font-bold tracking-tight">
             Pôster da Partida
           </h3>
-          <p className="text-xs text-[#F3EBDD]/70 font-body">
+          <p className="text-[11px] sm:text-xs text-[#F3EBDD]/70 font-body">
             A sua escultura de erros pronta para compartilhar
           </p>
         </div>
@@ -292,8 +292,8 @@ export const PosterModal: React.FC<PosterModalProps> = ({
       </header>
 
       {/* Poster Canvas Preview */}
-      <div className="flex-1 flex items-center justify-center my-3 overflow-hidden">
-        <div className="relative max-h-full max-w-full aspect-[4/5] rounded-xl shadow-2xl border border-white/20 overflow-hidden flex items-center justify-center bg-[#F3EBDD]">
+      <div className="min-h-0 flex-1 shrink flex items-center justify-center my-1.5 overflow-hidden">
+        <div className="relative max-h-full max-w-[280px] sm:max-w-none aspect-[4/5] rounded-xl shadow-2xl border border-white/20 overflow-hidden flex items-center justify-center bg-[#F3EBDD] shrink">
           <canvas
             ref={canvasRef}
             className="w-full h-full object-contain block"
@@ -319,21 +319,21 @@ export const PosterModal: React.FC<PosterModalProps> = ({
       </div>
 
       {/* Bottom Actions: Native Share, Download, Copy */}
-      <footer className="pb-safe w-full flex flex-col gap-2">
+      <footer className="pb-safe shrink-0 w-full flex flex-col gap-1.5 pt-1">
         {/* Dominant Primary CTA */}
         <button
           onClick={handleNativeShare}
-          className="w-full h-13 bg-[#D94336] hover:bg-[#c3382c] text-white font-display text-sm font-bold tracking-wide rounded-xl flex items-center justify-center gap-2 active:scale-[0.98] transition-all shadow-md"
+          className="w-full h-11 sm:h-13 bg-[#D94336] hover:bg-[#c3382c] text-white font-display text-xs sm:text-sm font-bold tracking-wide rounded-xl flex items-center justify-center gap-2 active:scale-[0.98] transition-all shadow-md shrink-0"
         >
           <Share2 className="w-4 h-4 fill-current" />
           <span>COMPARTILHAR IMAGEM</span>
         </button>
 
         {/* Secondary Clean Buttons */}
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-1.5 sm:gap-2 shrink-0">
           <button
             onClick={handleDownload}
-            className="h-11 bg-white/15 hover:bg-white/25 text-[#F3EBDD] border border-white/10 rounded-xl text-xs font-display font-medium flex items-center justify-center gap-1.5 active:scale-95 transition-all"
+            className="h-9 sm:h-11 bg-white/15 hover:bg-white/25 text-[#F3EBDD] border border-white/10 rounded-xl text-xs font-display font-medium flex items-center justify-center gap-1.5 active:scale-95 transition-all"
           >
             {downloaded ? <Check className="w-4 h-4 text-emerald-400" /> : <Download className="w-4 h-4" />}
             <span>{downloaded ? 'Baixado!' : 'Salvar PNG'}</span>
@@ -341,7 +341,7 @@ export const PosterModal: React.FC<PosterModalProps> = ({
 
           <button
             onClick={handleCopyText}
-            className="h-11 bg-white/15 hover:bg-white/25 text-[#F3EBDD] border border-white/10 rounded-xl text-xs font-display font-medium flex items-center justify-center gap-1.5 active:scale-95 transition-all"
+            className="h-9 sm:h-11 bg-white/15 hover:bg-white/25 text-[#F3EBDD] border border-white/10 rounded-xl text-xs font-display font-medium flex items-center justify-center gap-1.5 active:scale-95 transition-all"
           >
             {copiedText ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
             <span>{copiedText ? 'Copiado!' : 'Copiar Texto'}</span>

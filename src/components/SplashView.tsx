@@ -26,10 +26,10 @@ export const SplashView: React.FC<SplashViewProps> = ({ onStart }) => {
   return (
     <div 
       onClick={handleClick}
-      className="relative w-full h-full flex flex-col items-center justify-between p-8 paper-texture cursor-pointer select-none"
+      className="relative w-full h-full flex flex-col items-center justify-between px-4 sm:px-8 py-3 sm:py-6 paper-texture cursor-pointer select-none overflow-hidden"
     >
-      <div className="pt-safe w-full flex justify-end">
-        <span className="text-xs font-mono tracking-widest text-[#B7B2A8] uppercase">
+      <div className="pt-safe shrink-0 w-full flex justify-end">
+        <span className="text-[10px] sm:text-xs font-mono tracking-widest text-[#B7B2A8] uppercase">
           Edição Arcade
         </span>
       </div>

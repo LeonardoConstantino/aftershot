@@ -127,14 +127,14 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
   };
 
   return (
-    <div className="absolute inset-0 z-30 bg-[#F3EBDD]/90 backdrop-blur-xs flex flex-col justify-between p-6 sm:p-8 select-none animate-fadeIn">
+    <div className="absolute inset-0 z-30 bg-[#F3EBDD]/95 backdrop-blur-xs flex flex-col justify-between px-4 sm:px-6 py-2.5 sm:py-4 select-none animate-fadeIn overflow-hidden">
       {/* Top Header */}
-      <header className="pt-safe w-full flex items-center justify-between">
+      <header className="pt-safe shrink-0 w-full flex items-center justify-between pb-1">
         <div>
-          <span className="text-[11px] font-mono tracking-widest text-[#B7B2A8] uppercase">
+          <span className="text-[10px] sm:text-[11px] font-mono tracking-widest text-[#B7B2A8] uppercase">
             Fim de Partida
           </span>
-          <h2 className="font-display text-2xl font-bold tracking-tight text-[#222321]">
+          <h2 className="font-display text-xl sm:text-2xl font-bold tracking-tight text-[#222321]">
             A Sua Assinatura
           </h2>
         </div>
@@ -149,21 +149,21 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
       </header>
 
       {/* Middle: Canvas sculpture of persistent arrows & session stats */}
-      <div className="flex-1 flex flex-col items-center justify-center my-4 gap-4">
+      <div className="min-h-0 flex-1 shrink flex flex-col items-center justify-center my-auto py-1 gap-2 sm:gap-3 overflow-hidden">
         {/* Miniature Sculpture Frame */}
-        <div className="relative w-full max-w-[280px] h-44 sm:h-52 bg-white rounded-2xl border border-[#222321]/15 shadow-sm overflow-hidden flex items-center justify-center">
+        <div className="relative w-full max-w-[240px] sm:max-w-[280px] h-28 xs:h-36 sm:h-44 max-h-[25vh] bg-white rounded-xl sm:rounded-2xl border border-[#222321]/15 shadow-sm overflow-hidden flex items-center justify-center shrink">
           <canvas
             ref={replayCanvasRef}
             width={280}
             height={208}
-            className="w-full h-full block"
+            className="w-full h-full block object-contain"
           />
 
           {/* Replay trigger overlay */}
           {session.persistentArrows.length > 0 && !isReplaying && (
             <button
               onClick={startReplay}
-              className="absolute bottom-2.5 right-2.5 px-2.5 py-1.5 rounded-lg bg-[#222321]/80 hover:bg-[#222321] text-[#F3EBDD] text-[11px] font-display font-medium flex items-center gap-1 backdrop-blur-xs active:scale-95 transition-all"
+              className="absolute bottom-2 right-2 px-2.5 py-1 rounded-lg bg-[#222321]/80 hover:bg-[#222321] text-[#F3EBDD] text-[10px] sm:text-[11px] font-display font-medium flex items-center gap-1 backdrop-blur-xs active:scale-95 transition-all"
             >
               <Eye className="w-3.5 h-3.5" />
               <span>Rever</span>
@@ -171,57 +171,57 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
           )}
 
           {isReplaying && (
-            <div className="absolute top-2.5 left-2.5 px-2 py-0.5 rounded bg-[#D94336] text-white text-[10px] font-mono uppercase tracking-wider">
+            <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-[#D94336] text-white text-[10px] font-mono uppercase tracking-wider">
               Replay
             </div>
           )}
         </div>
 
         {/* Big Score & High Impact Stats */}
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center shrink-0">
           {isNewRecord && (
-            <span className="text-[11px] font-mono font-bold tracking-widest text-[#D94336] uppercase mb-1 animate-pulse">
+            <span className="text-[10px] sm:text-[11px] font-mono font-bold tracking-widest text-[#D94336] uppercase mb-0.5 animate-pulse">
               Novo Recorde Pessoal
             </span>
           )}
 
-          <div className="flex items-baseline gap-2">
-            <span className="font-display text-5xl sm:text-6xl font-bold tracking-tight text-[#222321] tabular-nums leading-none">
+          <div className="flex items-baseline gap-1.5 sm:gap-2">
+            <span className="font-display text-4xl sm:text-5xl font-bold tracking-tight text-[#222321] tabular-nums leading-none">
               {session.score}
             </span>
-            <span className="text-xs font-mono text-[#222321]/60 uppercase tracking-widest">
+            <span className="text-[11px] sm:text-xs font-mono text-[#222321]/60 uppercase tracking-widest">
               pontos
             </span>
           </div>
 
           {/* Minimalist unboxed metrics */}
-          <div className="flex items-center gap-3 text-xs text-[#222321]/70 font-body mt-2">
+          <div className="flex items-center gap-2 sm:gap-3 text-[11px] sm:text-xs text-[#222321]/70 font-body mt-1">
             <span>{session.precisionHits} precisos</span>
             <span aria-hidden="true" className="text-[#B7B2A8]">·</span>
             <span>Seq. máxima {session.maxStreak}</span>
             <span aria-hidden="true" className="text-[#B7B2A8]">·</span>
-            <span>{session.persistentArrows.length} flechas no campo</span>
+            <span>{session.persistentArrows.length} flechas</span>
           </div>
         </div>
       </div>
 
       {/* Bottom CTAs: Mobile thumb zone */}
-      <footer className="pb-safe w-full flex flex-col gap-2.5">
+      <footer className="pb-safe shrink-0 w-full flex flex-col gap-2 pt-1">
         {/* Primary CTA: Jogar Novamente */}
         <button
           onClick={() => handleAction(onPlayAgain)}
-          className="w-full h-14 bg-[#222321] hover:bg-[#343532] text-[#F3EBDD] font-display text-base font-bold tracking-wide rounded-xl flex items-center justify-center gap-2 active:scale-[0.98] transition-all shadow-md"
+          className="w-full h-12 sm:h-14 bg-[#222321] hover:bg-[#343532] text-[#F3EBDD] font-display text-sm sm:text-base font-bold tracking-wide rounded-xl flex items-center justify-center gap-2 active:scale-[0.98] transition-all shadow-md shrink-0"
         >
-          <RotateCcw className="w-5 h-5" />
+          <RotateCcw className="w-4 h-4 sm:w-5 sm:h-5" />
           <span>JOGAR NOVAMENTE</span>
         </button>
 
         {/* Secondary Action: Compartilhar Imagem (Pôster Minimalista) */}
         <button
           onClick={() => handleAction(onOpenSharePoster)}
-          className="w-full h-12 bg-white hover:bg-[#FFFDF7] border border-[#222321]/15 text-[#222321] font-display text-xs font-bold tracking-wide rounded-xl flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
+          className="w-full h-10 sm:h-12 bg-white hover:bg-[#FFFDF7] border border-[#222321]/15 text-[#222321] font-display text-xs sm:text-xs font-bold tracking-wide rounded-xl flex items-center justify-center gap-2 active:scale-[0.98] transition-all shrink-0"
         >
-          <Share2 className="w-4 h-4 text-[#D94336]" />
+          <Share2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#D94336]" />
           <span>COMPARTILHAR IMAGEM</span>
         </button>
       </footer>

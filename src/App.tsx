@@ -22,6 +22,7 @@ import { PosterModal } from './components/PosterModal';
 import { RecordsModal } from './components/RecordsModal';
 import { SettingsModal } from './components/SettingsModal';
 import { HowToPlayModal } from './components/HowToPlayModal';
+import { LandscapeOverlay } from './components/LandscapeOverlay';
 
 export default function App() {
   const [screen, setScreen] = useState<GameScreen>('SPLASH');
@@ -142,9 +143,12 @@ export default function App() {
   }, []);
 
   return (
-    <div className="relative w-full h-full min-h-screen bg-[#E5DDD0] flex items-center justify-center overflow-hidden font-body">
+    <div className="relative w-full h-dynamic-screen h-[100dvh] max-h-[100dvh] bg-[#E5DDD0] flex items-center justify-center overflow-hidden font-body">
+      {/* Orientation advisory when device is rotated to landscape */}
+      <LandscapeOverlay />
+
       {/* Mobile-first viewport container (full screen on mobile, elegant centered portrait frame on wide screens) */}
-      <main className="relative w-full h-full max-w-[480px] max-h-[920px] bg-[#F3EBDD] overflow-hidden shadow-2xl flex flex-col sm:border sm:border-[#222321]/15 sm:rounded-3xl">
+      <main className="relative w-full h-full max-w-[480px] sm:max-h-[920px] bg-[#F3EBDD] overflow-hidden shadow-2xl flex flex-col sm:border sm:border-[#222321]/15 sm:rounded-3xl">
         {/* Screen 1: Splash */}
         {screen === 'SPLASH' && (
           <SplashView onStart={() => setScreen('MENU')} />

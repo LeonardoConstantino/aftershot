@@ -28,8 +28,8 @@ export const PauseModal: React.FC<PauseModalProps> = ({
   };
 
   return (
-    <div className="absolute inset-0 z-30 bg-[#F3EBDD]/80 backdrop-blur-xs flex items-center justify-center p-6 select-none animate-fadeIn">
-      <div className="w-full max-w-xs bg-white/95 border border-[#222321]/15 rounded-2xl p-6 shadow-xl flex flex-col gap-4 text-center">
+    <div className="absolute inset-0 z-30 bg-[#F3EBDD]/80 backdrop-blur-xs flex items-center justify-center p-4 select-none animate-fadeIn overflow-hidden">
+      <div className="w-full max-w-xs max-h-[92dvh] overflow-y-auto bg-white/95 border border-[#222321]/15 rounded-2xl p-5 sm:p-6 shadow-xl flex flex-col gap-3 sm:gap-4 text-center">
         <div>
           <h2 className="font-display text-xl font-bold tracking-tight text-[#222321]">
             Jogo Pausado

@@ -24,6 +24,8 @@
     padding: 0;
     width: 100%;
     height: 100%;
+    height: 100dvh;
+    min-height: -webkit-fill-available;
     overflow: hidden;
     background-color: var(--color-ivory);
     color: var(--color-charcoal);
@@ -45,18 +47,23 @@
   background-size: 24px 24px;
 }
 
-/* Mobile Safe Areas */
+/* Mobile Safe Areas (balanced with max to avoid double-padding) */
 .pt-safe {
-  padding-top: env(safe-area-inset-top, 16px);
+  padding-top: max(env(safe-area-inset-top, 0px), 10px);
 }
 .pb-safe {
-  padding-bottom: env(safe-area-inset-bottom, 20px);
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 12px);
 }
 .pl-safe {
-  padding-left: env(safe-area-inset-left, 16px);
+  padding-left: max(env(safe-area-inset-left, 0px), 12px);
 }
 .pr-safe {
-  padding-right: env(safe-area-inset-right, 16px);
+  padding-right: max(env(safe-area-inset-right, 0px), 12px);
+}
+
+.h-dynamic-screen {
+  height: 100vh;
+  height: 100dvh;
 }
 
 /* Custom Editorial Scrollbar Styling */
