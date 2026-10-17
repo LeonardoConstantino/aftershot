@@ -13,6 +13,7 @@ export interface RenderContext {
   bowOrigin: Point;
   aimVector: { x: number; y: number } | null;
   trajectoryPoints: Point[];
+  trajectoryAlpha?: number;
   shakeOffset: { x: number; y: number };
   highlightNearMiss?: Point | null;
 }
@@ -37,6 +38,7 @@ export function renderGameScene(options: RenderContext): void {
     bowOrigin,
     aimVector,
     trajectoryPoints,
+    trajectoryAlpha = 1.0,
     shakeOffset,
     highlightNearMiss,
   } = options;
@@ -68,7 +70,7 @@ export function renderGameScene(options: RenderContext): void {
 
   // 5. Draw trajectory & bow if aiming
   if (aimVector && trajectoryPoints.length > 0) {
-    drawAimingTrajectory(ctx, trajectoryPoints, highlightNearMiss);
+    drawAimingTrajectory(ctx, trajectoryPoints, highlightNearMiss, trajectoryAlpha);
     drawBowAndArrow(ctx, bowOrigin, aimVector);
   } else if (!flyingArrow) {
     // Idle bow at rest
@@ -461,16 +463,22 @@ function drawFlyingArrow(ctx: CanvasRenderingContext2D, arrow: FlyingArrow): voi
 }
 
 /**
- * Render the trajectory prediction curve with kinetic amber dashed styling
+ * Render the trajectory prediction curve with kinetic amber dashed styling.
+ * Supports progressive transparency ('Mira Aguçada') to challenge experienced players.
  */
 function drawAimingTrajectory(
   ctx: CanvasRenderingContext2D,
   points: Point[],
-  nearMiss?: Point | null
+  nearMiss?: Point | null,
+  alpha: number = 1.0
 ): void {
   if (points.length < 2) return;
 
+  // Safe bounds: gradual and subtle decay with floor at 0.18 so keen players can always track it
+  const safeAlpha = Math.max(0.18, Math.min(1.0, alpha));
+
   ctx.save();
+  ctx.globalAlpha = safeAlpha;
   ctx.strokeStyle = COLOR_AMBER;
   ctx.lineWidth = 1.8;
   ctx.setLineDash([5, 4]);
@@ -487,11 +495,12 @@ function drawAimingTrajectory(
   const prev = points[points.length - 2];
   const angle = Math.atan2(last.y - prev.y, last.x - prev.x);
 
+  ctx.save();
   ctx.setLineDash([]);
   ctx.fillStyle = COLOR_AMBER;
-  ctx.beginPath();
   ctx.translate(last.x, last.y);
   ctx.rotate(angle);
+  ctx.beginPath();
   ctx.moveTo(0, 0);
   ctx.lineTo(-8, -4.0);
   ctx.lineTo(-6, 0);
@@ -503,6 +512,7 @@ function drawAimingTrajectory(
   // If there's a near-miss clearance highlight point, draw a subtle amber ping
   if (nearMiss) {
     ctx.save();
+    ctx.globalAlpha = Math.max(0.35, safeAlpha);
     ctx.strokeStyle = COLOR_AMBER;
     ctx.lineWidth = 1.4;
     ctx.beginPath();
@@ -510,6 +520,8 @@ function drawAimingTrajectory(
     ctx.stroke();
     ctx.restore();
   }
+
+  ctx.restore();
 }
 
 /**

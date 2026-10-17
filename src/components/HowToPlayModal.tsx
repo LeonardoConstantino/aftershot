@@ -49,7 +49,7 @@ export const HowToPlayModal: React.FC<HowToPlayModalProps> = ({ onClose }) => {
             </h3>
           </div>
           <p className="text-xs text-[#222321]/75 leading-relaxed font-body">
-            Toque na tela e puxe para trás para tensionar a corda do arco. A linha tracejada âmbar indica a rota balística. Solte para disparar.
+            Toque na tela e puxe para trás para tensionar a corda do arco. A linha tracejada âmbar indica a rota balística. Conforme acumula flechas na partida, a linha se torna sutilmente translúcida — desafiando sua mira aguçada e instinto. Solte para disparar.
           </p>
         </div>
 

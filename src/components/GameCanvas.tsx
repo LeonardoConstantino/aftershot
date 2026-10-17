@@ -80,6 +80,10 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
   // Micro-feedback badge ("PRECISO")
   const [precisionToast, setPrecisionToast] = useState<{ id: number; text: string; x: number; y: number } | null>(null);
 
+  // Progressive difficulty challenge: "Mira Aguçada"
+  const [keenAimToast, setKeenAimToast] = useState<boolean>(false);
+  const keenAimAnnouncedRef = useRef<boolean>(false);
+
   // Dynamic canvas sizing
   const [dimensions, setDimensions] = useState<{ width: number; height: number }>({ width: 390, height: 750 });
 
@@ -684,7 +688,27 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
         }
       }
 
-      // 5. Render Scene onto Canvas
+      // 5. Progressive Aim Transparency ("Mira Aguçada")
+      // Starting from 8 arrows fired onwards, the trajectory line becomes gradually and subtly transparent
+      const FADE_START_ARROWS = 7;
+      const FADE_RATE = 0.038;
+      const MIN_AIM_ALPHA = 0.22;
+
+      const arrowsCount = totalShotsRef.current;
+      const trajectoryAlpha = arrowsCount <= FADE_START_ARROWS
+        ? 1.0
+        : Math.max(MIN_AIM_ALPHA, 1.0 - (arrowsCount - FADE_START_ARROWS) * FADE_RATE);
+
+      // Trigger subtle milestone announcement on 8th arrow
+      if (arrowsCount >= FADE_START_ARROWS && !keenAimAnnouncedRef.current) {
+        keenAimAnnouncedRef.current = true;
+        setKeenAimToast(true);
+        setTimeout(() => {
+          setKeenAimToast(false);
+        }, 2200);
+      }
+
+      // 6. Render Scene onto Canvas
       ctx.save();
       ctx.scale(dpr, dpr);
 
@@ -701,6 +725,7 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
         bowOrigin: bowOriginRef.current,
         aimVector,
         trajectoryPoints,
+        trajectoryAlpha,
         shakeOffset,
         highlightNearMiss,
       });
@@ -757,6 +782,16 @@ export const GameCanvas: React.FC<GameCanvasProps> = ({
           style={{ left: precisionToast.x, top: precisionToast.y }}
         >
           {precisionToast.text}
+        </div>
+      )}
+
+      {/* Subtle milestone announcement for Keen Aim challenge */}
+      {keenAimToast && (
+        <div className="absolute top-14 left-1/2 -translate-x-1/2 pointer-events-none z-30 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#222321]/90 backdrop-blur-xs text-[#F3EBDD] border border-[#FFFDF7]/15 shadow-sm animate-fadeIn">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#E9A23B] animate-pulse" />
+          <span className="text-[11px] font-display font-semibold tracking-wider uppercase">
+            Mira Aguçada Ativada
+          </span>
         </div>
       )}
     </div>

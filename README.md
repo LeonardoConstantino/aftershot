@@ -42,6 +42,7 @@ Conforme a partida progride, o campo de tiro se transforma em uma escultura viva
 - 🎨 **Desenho Detalhado de Flechas**: Ponteira *broadhead* chanfrada em diamante navalha, haste cilíndrica com linhas de luz, amarrações de fio (*bindings*) e empenagem parabólica com estrias de penas.
 - 🔊 **Síntese de Áudio Procedural & Coro de Memória**: 100% sintetizado via Web Audio API (sem dependência de arquivos de áudio externos). O ambiente acústico ganha densidade harmônica conforme mais flechas habitam o campo.
 - 📳 **Resposta Tátil Háptica**: Micropulsos vibratórios em dispositivos móveis (`navigator.vibrate`) para disparos, impactos e colisões.
+- 👁️ **Mira Aguçada (Desafio Progressivo)**: A partir de 8 flechas disparadas, a linha de trajetória torna-se sutil e gradualmente translúcida, convidando o jogador a confiar na intuição e memória muscular sem jamais ser punitivo (mantendo um piso translúcido mínimo de referência).
 - 🖼️ **Pôster de Compartilhamento ("A Sua Assinatura")**: Gera uma peça gráfica estática em alta resolução (1080x1350) com a escultura exata da partida, frase filosófica curada e suporte à Web Share API, download em PNG e cópia de texto.
 - 📱 **Mobile-First & Touch Ergonômico**: Área de toque otimizada para o polegar, prevenção total de zoom ou rolagem indesejada, e scrollbar customizada ultraminimalista.
 
